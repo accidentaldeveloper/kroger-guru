@@ -44,6 +44,7 @@ export default function App() {
         <Links />
       </head>
       <body className="h-full">
+        <h1 className="text-2xl">Kroger Guru</h1>
         <Outlet />
         <ScrollRestoration />
         <Scripts />
