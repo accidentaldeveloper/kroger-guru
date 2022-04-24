@@ -15,7 +15,7 @@ export function getCollection({
   });
 }
 
-export function getCollectionCollectionItems({ userId }: { userId: User["id"] }) {
+export function getCollectionListItems({ userId }: { userId: User["id"] }) {
   return prisma.collection.findMany({
     where: { userId },
     select: { id: true, title: true },
