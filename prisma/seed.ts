@@ -24,17 +24,17 @@ async function seed() {
     },
   });
 
-  await prisma.list.create({
+  await prisma.collection.create({
     data: {
-      title: "My first list",
+      title: "My first collection",
       body: "Delicious stuff",
       userId: user.id,
     },
   });
 
-  await prisma.list.create({
+  await prisma.collection.create({
     data: {
-      title: "My second list",
+      title: "My second collection",
       body: "Also delicious",
       userId: user.id,
     },

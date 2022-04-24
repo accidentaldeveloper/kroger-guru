@@ -3,42 +3,42 @@ import { json, redirect } from "@remix-run/node";
 import { Form, useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
-import type { Note } from "~/models/note.server";
-import { deleteNote } from "~/models/note.server";
-import { getNote } from "~/models/note.server";
+import type { Collection } from "~/models/collection.server";
+import { deleteCollection } from "~/models/collection.server";
+import { getCollection } from "~/models/collection.server";
 import { requireUserId } from "~/session.server";
 
 type LoaderData = {
-  note: Note;
+  collection: Collection;
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const userId = await requireUserId(request);
-  invariant(params.noteId, "noteId not found");
+  invariant(params.collectionId, "collectionId not found");
 
-  const note = await getNote({ userId, id: params.noteId });
-  if (!note) {
+  const collection = await getCollection({ userId, id: params.collectionId });
+  if (!collection) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json<LoaderData>({ note });
+  return json<LoaderData>({ collection });
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
   const userId = await requireUserId(request);
-  invariant(params.noteId, "noteId not found");
+  invariant(params.collectionId, "collectionId not found");
 
-  await deleteNote({ userId, id: params.noteId });
+  await deleteCollection({ userId, id: params.collectionId });
 
-  return redirect("/notes");
+  return redirect("/collections");
 };
 
-export default function NoteDetailsPage() {
+export default function CollectionDetailsPage() {
   const data = useLoaderData() as LoaderData;
 
   return (
     <div>
-      <h3 className="text-2xl font-bold">{data.note.title}</h3>
-      <p className="py-6">{data.note.body}</p>
+      <h3 className="text-2xl font-bold">{data.collection.title}</h3>
+      <p className="py-6">{data.collection.body}</p>
       <hr className="my-4" />
       <Form method="post">
         <button
@@ -62,7 +62,7 @@ export function CatchBoundary() {
   const caught = useCatch();
 
   if (caught.status === 404) {
-    return <div>Note not found</div>;
+    return <div>Collection not found</div>;
   }
 
   throw new Error(`Unexpected caught response with status: ${caught.status}`);
