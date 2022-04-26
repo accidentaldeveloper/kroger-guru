@@ -1,10 +1,12 @@
 import { useLoaderData } from "@remix-run/react";
 import type { LoaderFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
+import { SizeEnum } from "~/models/kroger/products.types";
+import type { Product } from "~/models/kroger/products.types";
 import { searchProducts } from "~/models/product.server";
 
 type LoaderData = {
-  searchResults: string[] | null;
+  searchResults: Product[] | null;
 };
 
 export const loader: LoaderFunction = async ({ request, params, context }) => {
@@ -24,9 +26,18 @@ export default () => {
       {searchResults ? (
         <>
           <h1 className="text-xl">Search results:</h1>
-          {searchResults.map((item) => (
-            <div key={item}>{item}</div>
-          ))}
+          {searchResults.map((item) => {
+            const image = item.images[0];
+            const mediumImage = image.sizes.find(i => i.size === SizeEnum.Medium)
+            console.log(image);
+            return (
+              <div key={item.description}>
+                <div>{item.description}</div>
+                <div>{item.brand}</div>
+                <img src={mediumImage?.url} alt=""></img>
+              </div>
+            );
+          })}
         </>
       ) : (
         <div>Submit a query</div>
