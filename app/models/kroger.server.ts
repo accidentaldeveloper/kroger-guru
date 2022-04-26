@@ -1,3 +1,5 @@
+import { ProductsResponse } from "./kroger/products.types";
+
 // import got from "got";
 const { KROGER_CLIENT_ID, KROGER_CLIENT_SECRET } = process.env;
 const base64Creds = Buffer.from(
@@ -5,7 +7,7 @@ const base64Creds = Buffer.from(
 ).toString("base64");
 const authString = `Basic ${base64Creds}`;
 
-async function fetchAccessToken() : Promise<string> {
+async function fetchAccessToken(): Promise<string> {
   const tokenUrl = "https://api.kroger.com/v1/connect/oauth2/token";
   const params = new URLSearchParams({
     grant_type: "client_credentials",
@@ -35,7 +37,7 @@ async function fetchAccessToken() : Promise<string> {
   return data.access_token;
 }
 
-export async function apiSearch(query: string) {
+export async function apiSearch(query: string): Promise<ProductsResponse> {
   const token = await fetchAccessToken();
   const url = new URL("https://api.kroger.com/v1/products");
   url.searchParams.append("filter.term", query);
