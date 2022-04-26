@@ -12,7 +12,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   const query = url.searchParams.get("query");
   let searchResults = null;
   if (query) {
-    searchResults = searchProducts(query);
+    searchResults = await searchProducts(query);
   }
   return json<LoaderData>({ searchResults });
 };

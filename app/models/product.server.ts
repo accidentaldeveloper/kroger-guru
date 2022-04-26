@@ -2,8 +2,8 @@
 
 import { apiSearch } from "./kroger.server";
 
-export function searchProducts(query: string) {
-  const response = apiSearch(query);
-  console.log(response)
-  return ["foo", query];
+export async function searchProducts(query: string) {
+  const response = await apiSearch(query);
+  console.log(response);
+  return response.data.map((p) => p.description);
 }
