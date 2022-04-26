@@ -5,79 +5,80 @@ export interface ProductsResponse {
 
 export interface Product {
     productId:       string;
-    upc:             string;
-    aisleLocations:  any[];
+    aisleLocations:  AisleLocation[];
     brand:           string;
     categories:      string[];
-    countryOrigin:   CountryOrigin;
+    countryOrigin:   string;
     description:     string;
-    images:          Image[];
     items:           Item[];
     itemInformation: ItemInformation;
     temperature:     Temperature;
+    images:          Image[];
+    upc:             string;
 }
 
-export enum CountryOrigin {
-    Mexico = "MEXICO",
-    UnitedStates = "UNITED STATES",
+export interface AisleLocation {
+    bayNumber:          string;
+    description:        string;
+    number:             string;
+    numberOfFacings:    string;
+    sequenceNumber:     string;
+    side:               string;
+    shelfNumber:        string;
+    shelfPositionInBay: string;
 }
 
 export interface Image {
-    perspective: Perspective;
-    featured?:   boolean;
-    sizes:       SizeElement[];
+    id:          string;
+    perspective: string;
+    default:     boolean;
+    sizes:       Size[];
 }
 
-export enum Perspective {
-    Back = "back",
-    Front = "front",
-    Left = "left",
-    Right = "right",
-    Top = "top",
-}
-
-export interface SizeElement {
-    size: SizeEnum;
+export interface Size {
+    id:   string;
+    size: string;
     url:  string;
 }
 
-export enum SizeEnum {
-    Large = "large",
-    Medium = "medium",
-    Small = "small",
-    Thumbnail = "thumbnail",
-    Xlarge = "xlarge",
-}
-
 export interface ItemInformation {
+    depth:  string;
+    height: string;
+    width:  string;
 }
 
 export interface Item {
-    itemId:      string;
-    favorite:    boolean;
-    fulfillment: Fulfillment;
-    size:        string;
+    itemId:        string;
+    favorite:      boolean;
+    fulfillment:   Fulfillment;
+    price:         Price;
+    nationalPrice: Price;
+    size:          string;
+    soldBy:        string;
 }
 
 export interface Fulfillment {
     curbside:   boolean;
     delivery:   boolean;
-    inStore:    boolean;
-    shipToHome: boolean;
+    instore:    boolean;
+    shiptohome: boolean;
+}
+
+export interface Price {
+    regular:                number;
+    promo:                  number;
+    regularPerUnitEstimate: number;
+    promoPerUnitEstimate:   number;
 }
 
 export interface Temperature {
-    indicator:     Indicator;
+    indicator:     string;
     heatSensitive: boolean;
-}
-
-export enum Indicator {
-    Ambient = "Ambient",
-    Frozen = "Frozen",
 }
 
 export interface Meta {
     pagination: Pagination;
+    warnings:   string[];
 }
 
 export interface Pagination {
