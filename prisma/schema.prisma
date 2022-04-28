@@ -45,4 +45,6 @@ model CollectionProduct {
 
   collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   collectionId String
+
+  @@unique([collectionId, sku], map: "unique_index_CollectionProduct")
 }
