@@ -37,11 +37,11 @@ async function fetchAccessToken(): Promise<string> {
   return data.access_token;
 }
 
-export async function apiSearch(query: string): Promise<ProductsResponse> {
+const productsUrl = "https://api.kroger.com/v1/products";
+async function searchProducts(searchParams: URLSearchParams) {
   const token = await fetchAccessToken();
-  const url = new URL("https://api.kroger.com/v1/products");
-  url.searchParams.append("filter.term", query);
-  const res = await fetch(url.toString(), {
+  const url = productsUrl + "?" + searchParams.toString();
+  const res = await fetch(url, {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -50,4 +50,19 @@ export async function apiSearch(query: string): Promise<ProductsResponse> {
   }
   const data = await res.json();
   return data;
+}
+
+export async function fetchProductsByQuery(query: string): Promise<ProductsResponse> {
+  const searchParams = new URLSearchParams({ "filter.term": query });
+  return searchProducts(searchParams);
+}
+
+export async function fetchProductsByProductIds(
+  productIds: string[]
+): Promise<ProductsResponse> {
+  const productIdsString = productIds.join(",");
+  const searchParams = new URLSearchParams({
+    "filter.productId": productIdsString,
+  });
+  return searchProducts(searchParams);
 }

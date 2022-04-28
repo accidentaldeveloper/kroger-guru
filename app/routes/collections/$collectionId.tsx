@@ -1,15 +1,18 @@
+import type { CollectionProduct } from "@prisma/client";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
-import type { Collection } from "~/models/collection.server";
 import { deleteCollection } from "~/models/collection.server";
 import { getCollection } from "~/models/collection.server";
+import { fetchProductsByProductIds } from "~/models/kroger.server";
+import type { Product } from "~/models/kroger/products.types";
 import { requireUserId } from "~/session.server";
 
 type LoaderData = {
   collection: Awaited<ReturnType<typeof getCollection>>;
+  productDetails: Product[];
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
@@ -20,7 +23,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   if (!collection) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json<LoaderData>({ collection });
+  const { products } = collection;
+  const productDetails = await fetchProductDetails(products);
+  return json<LoaderData>({ collection, productDetails });
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
@@ -32,11 +37,23 @@ export const action: ActionFunction = async ({ request, params }) => {
   return redirect("/collections");
 };
 
+async function fetchProductDetails(
+  products: CollectionProduct[]
+): Promise<Product[]> {
+  if (products.length === 0) {
+    return [];
+  }
+
+  const productIds = products.map((p) => p.productId);
+  const productDetails = await fetchProductsByProductIds(productIds);
+  return productDetails.data;
+}
+
 export default function CollectionDetailsPage() {
   const { collection } = useLoaderData() as LoaderData;
 
   if (collection === null) {
-    throw Error("data is null!");
+    throw Error("collection is null!");
   }
 
   return (
