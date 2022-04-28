@@ -18,7 +18,7 @@ type LoaderData = {
 
 type ActionData = {
   errors?: {
-    upc?: string;
+    productId?: string;
   };
 };
 
@@ -36,17 +36,17 @@ export const action: ActionFunction = async ({ request, params, context }) => {
   const userId = await requireUserId(request);
 
   const formData = await request.formData();
-  const upc = formData.get("upc");
+  const productId = formData.get("productId");
 
-  if (typeof upc !== "string" || upc.length === 0) {
+  if (typeof productId !== "string" || productId.length === 0) {
     return json<ActionData>(
-      { errors: { upc: "UPC is required" } },
+      { errors: { productId: "ProductId is required" } },
       { status: 400 }
     );
   }
   const collectionId = "cl2j44tdm0020edswke8gg0ys";
   const addedProduct = await addProductToCollection({
-    upc,
+    productId,
     collectionId,
     userId,
   });
@@ -67,12 +67,16 @@ export default () => {
                 (i) => i.size === SizeEnum.Medium
               );
               return (
-                <div key={item.upc} className="w-96 border-2 py-4">
+                <div key={item.productId} className="w-96 border-2 py-4">
                   <div>{item.description}</div>
                   <div>{item.brand}</div>
                   <img src={mediumImage?.url} alt=""></img>
                   <Form method="post">
-                    <input type="hidden" name="upc" value={item.upc} />
+                    <input
+                      type="hidden"
+                      name="productId"
+                      value={item.productId}
+                    />
                     <button className="rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700">
                       Add to collection
                     </button>

@@ -56,9 +56,9 @@ export function deleteCollection({
 export async function addProductToCollection({
   collectionId,
   userId,
-  upc,
+  productId,
 }: { collectionId: Collection["id"] } & { userId: User["id"] } & {
-  upc: CollectionProduct["upc"];
+  productId: CollectionProduct["productId"];
 }) {
   // Need to check for ownership before adding product
   const matchingCollection = await prisma.collection.findFirst({
@@ -69,12 +69,12 @@ export async function addProductToCollection({
   }
   return prisma.collectionProduct.upsert({
     where: {
-      collectionId_upc: { collectionId, upc },
+      collectionId_productId: { collectionId, productId },
     },
     update: {},
     create: {
       collectionId,
-      upc,
+      productId,
     },
   });
 }

@@ -41,12 +41,12 @@ model Collection {
 
 model CollectionProduct {
   id  String @id @default(cuid())
-  upc String
+  productId String
 
   createdAt DateTime @default(now())
 
   collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   collectionId String
 
-  @@unique([collectionId, upc], map: "unique_index_CollectionProduct")
+  @@unique([collectionId, productId], map: "unique_index_CollectionProduct")
 }

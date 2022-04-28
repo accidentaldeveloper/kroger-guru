@@ -45,7 +45,7 @@ export default function CollectionDetailsPage() {
       <p className="py-6">{collection.body}</p>
       <div>
         {collection.products.map((p) => (
-          <div key={p.id}>{p.upc}</div>
+          <div key={p.id}>{p.productId}</div>
         ))}
       </div>
       <hr className="my-4" />
