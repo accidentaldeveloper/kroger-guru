@@ -3,6 +3,7 @@ import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
+import { ProductCard } from "~/components/product-card";
 
 import { deleteCollection } from "~/models/collection.server";
 import { getCollection } from "~/models/collection.server";
@@ -50,7 +51,7 @@ async function fetchProductDetails(
 }
 
 export default function CollectionDetailsPage() {
-  const { collection } = useLoaderData() as LoaderData;
+  const { collection, productDetails } = useLoaderData() as LoaderData;
 
   if (collection === null) {
     throw Error("collection is null!");
@@ -61,8 +62,8 @@ export default function CollectionDetailsPage() {
       <h3 className="text-2xl font-bold">{collection.title}</h3>
       <p className="py-6">{collection.body}</p>
       <div>
-        {collection.products.map((p) => (
-          <div key={p.id}>{p.productId}</div>
+        {productDetails.map((p) => (
+          <ProductCard key={p.productId} item={p} />
         ))}
       </div>
       <hr className="my-4" />
