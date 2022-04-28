@@ -28,10 +28,11 @@ export default () => {
           <h1 className="text-xl">Search results:</h1>
           {searchResults.map((item) => {
             const image = item.images[0];
-            const mediumImage = image.sizes.find(i => i.size === SizeEnum.Medium)
-            console.log(image);
+            const mediumImage = image.sizes.find(
+              (i) => i.size === SizeEnum.Medium
+            );
             return (
-              <div key={item.description}>
+              <div key={item.upc}>
                 <div>{item.description}</div>
                 <div>{item.brand}</div>
                 <img src={mediumImage?.url} alt=""></img>
