@@ -1,9 +1,6 @@
 import { Form, useLoaderData } from "@remix-run/react";
-import {
-  ActionFunction,
-  LoaderFunction,
-  redirect,
-} from "@remix-run/server-runtime";
+import type { ActionFunction, LoaderFunction } from "@remix-run/server-runtime";
+import { redirect } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
 import { SizeEnum } from "~/models/kroger/products.types";
 import type { Product } from "~/models/kroger/products.types";
@@ -38,9 +35,9 @@ export const action: ActionFunction = async ({ request, params, context }) => {
   const formData = await request.formData();
   const productId = formData.get("productId");
 
-  if (typeof productId !== "string" || productId.length === 0) {
+  if (typeof productId !== "string" || productId.length != 13) {
     return json<ActionData>(
-      { errors: { productId: "ProductId is required" } },
+      { errors: { productId: "Valid ProductId is required" } },
       { status: 400 }
     );
   }
