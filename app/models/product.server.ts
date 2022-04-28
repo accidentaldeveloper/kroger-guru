@@ -1,5 +1,3 @@
-// const credentials =
-
 import { apiSearch } from "./kroger.server";
 
 export async function searchProducts(query: string) {
