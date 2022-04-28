@@ -9,7 +9,7 @@ import { getCollection } from "~/models/collection.server";
 import { requireUserId } from "~/session.server";
 
 type LoaderData = {
-  collection: Collection;
+  collection: Awaited<ReturnType<typeof getCollection>>;
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
@@ -33,12 +33,21 @@ export const action: ActionFunction = async ({ request, params }) => {
 };
 
 export default function CollectionDetailsPage() {
-  const data = useLoaderData() as LoaderData;
+  const { collection } = useLoaderData() as LoaderData;
+
+  if (collection === null) {
+    throw Error("data is null!");
+  }
 
   return (
     <div>
-      <h3 className="text-2xl font-bold">{data.collection.title}</h3>
-      <p className="py-6">{data.collection.body}</p>
+      <h3 className="text-2xl font-bold">{collection.title}</h3>
+      <p className="py-6">{collection.body}</p>
+      <div>
+        {collection.products.map((p) => (
+          <div key={p.id}>{p.upc}</div>
+        ))}
+      </div>
       <hr className="my-4" />
       <Form method="post">
         <button

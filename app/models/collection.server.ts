@@ -1,4 +1,4 @@
-import type { User, Collection } from "@prisma/client";
+import type { User, Collection, CollectionProduct } from "@prisma/client";
 
 import { prisma } from "~/db.server";
 
@@ -12,6 +12,7 @@ export function getCollection({
 }) {
   return prisma.collection.findFirst({
     where: { id, userId },
+    include: { products: true },
   });
 }
 
@@ -49,5 +50,31 @@ export function deleteCollection({
 }: Pick<Collection, "id"> & { userId: User["id"] }) {
   return prisma.collection.deleteMany({
     where: { id, userId },
+  });
+}
+
+export async function addProductToCollection({
+  collectionId,
+  userId,
+  upc,
+}: { collectionId: Collection["id"] } & { userId: User["id"] } & {
+  upc: CollectionProduct["upc"];
+}) {
+  // Need to check for ownership before adding product
+  const matchingCollection = await prisma.collection.findFirst({
+    where: { id: collectionId, userId },
+  });
+  if (!matchingCollection) {
+    throw Error("Collection not available to update");
+  }
+  return prisma.collectionProduct.upsert({
+    where: {
+      collectionId_upc: { collectionId, upc },
+    },
+    update: {},
+    create: {
+      collectionId,
+      upc,
+    },
   });
 }
