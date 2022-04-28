@@ -44,7 +44,7 @@ export const action: ActionFunction = async ({ request, params, context }) => {
       { status: 400 }
     );
   }
-  const collectionId = "cl2j44tdm0020edswke8gg0ys";
+  const collectionId = "cl2j76w5q0020rsswhw0pi28x";
   const addedProduct = await addProductToCollection({
     productId,
     collectionId,
