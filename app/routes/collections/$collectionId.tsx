@@ -10,6 +10,7 @@ import { getCollection, removeProduct } from "~/models/collection.server";
 import { fetchProductsByProductIds } from "~/models/kroger.server";
 import type { Product } from "~/models/kroger/products.types";
 import { requireUserId } from "~/session.server";
+import { ProductSearch } from "../search";
 
 type LoaderData = {
   collection: Awaited<ReturnType<typeof getCollection>>;
@@ -100,6 +101,7 @@ export default function CollectionDetailsPage() {
           Delete
         </button>
       </Form>
+      <ProductSearch />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { Form, useLoaderData } from "@remix-run/react";
+import { Form, useFetcher, useLoaderData } from "@remix-run/react";
 import type { ActionFunction, LoaderFunction } from "@remix-run/server-runtime";
 import { redirect } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
@@ -50,15 +50,25 @@ export const action: ActionFunction = async ({ request, params, context }) => {
 
   return redirect(`/collections/${addedProduct.collectionId}`);
 };
-export default () => {
-  const { searchResults } = useLoaderData() as LoaderData;
+
+export const ProductSearch = () => {
+  const products = useFetcher<LoaderData>();
+  // const {searchResults} = ;
+
   return (
     <>
-      {searchResults ? (
+      <div>
+        <products.Form method="get" action="/search">
+          <div>Submit a query</div>
+          <input type={"text"} name="query" className="border-2" />
+        </products.Form>
+      </div>
+
+      {products.data && products.data.searchResults ? (
         <>
           <h1 className="text-xl">Search results:</h1>
           <div className="flex flex-wrap lg:w-3/4">
-            {searchResults.map((item) => {
+            {products.data.searchResults.map((item) => {
               const image = item.images[0];
               const mediumImage = image.sizes.find(
                 (i) => i.size === SizeEnum.Medium
@@ -84,12 +94,7 @@ export default () => {
           </div>
         </>
       ) : (
-        <div>
-          <Form>
-            <div>Submit a query</div>
-            <input type={"text"} name="query" className="border-2" />
-          </Form>
-        </div>
+        <div>make a query</div>
       )}
     </>
   );
