@@ -1,4 +1,7 @@
 // import got from "got";
+declare global {
+  var tokenCache: TokenCache;
+}
 
 const { KROGER_CLIENT_ID, KROGER_CLIENT_SECRET } = process.env;
 const base64Creds = Buffer.from(
