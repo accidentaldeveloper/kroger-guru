@@ -7,7 +7,7 @@ import type { Product } from "~/models/kroger/products.types";
 import { searchProducts } from "~/models/product.server";
 import { requireUserId } from "~/session.server";
 import invariant from "tiny-invariant";
-import { addProductToCollection } from "~/models/collection.server";
+import { addProduct } from "~/models/collection.server";
 
 type LoaderData = {
   searchResults: Product[] | null;
@@ -42,7 +42,7 @@ export const action: ActionFunction = async ({ request, params, context }) => {
     );
   }
   const collectionId = "cl2j76w5q0020rsswhw0pi28x";
-  const addedProduct = await addProductToCollection({
+  const addedProduct = await addProduct({
     productId,
     collectionId,
     userId,

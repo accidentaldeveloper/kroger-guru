@@ -53,7 +53,7 @@ export function deleteCollection({
   });
 }
 
-export async function addProductToCollection({
+export async function addProduct({
   collectionId,
   userId,
   productId,
@@ -75,6 +75,27 @@ export async function addProductToCollection({
     create: {
       collectionId,
       productId,
+    },
+  });
+}
+
+export async function removeProduct({
+  collectionId,
+  userId,
+  productId,
+}: { collectionId: Collection["id"] } & { userId: User["id"] } & {
+  productId: CollectionProduct["productId"];
+}) {
+  // Need to check for ownership before adding product
+  const matchingCollection = await prisma.collection.findFirst({
+    where: { id: collectionId, userId },
+  });
+  if (!matchingCollection) {
+    throw Error("Collection not available to update");
+  }
+  return prisma.collectionProduct.delete({
+    where: {
+      collectionId_productId: { collectionId, productId },
     },
   });
 }
