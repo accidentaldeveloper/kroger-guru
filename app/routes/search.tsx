@@ -8,6 +8,7 @@ import { requireUserId } from "~/session.server";
 import invariant from "tiny-invariant";
 import { addProduct } from "~/models/collection.server";
 import { ProductCard } from "~/components/product-card";
+import type { ReactNode } from "react";
 
 type LoaderData = {
   searchResults: Product[] | null;
@@ -33,15 +34,17 @@ export const action: ActionFunction = async ({ request, params, context }) => {
   const userId = await requireUserId(request);
 
   const formData = await request.formData();
-  const productId = formData.get("productId");
+  const collectionId = formData.get("collectionId");
+  invariant(typeof collectionId === "string", "collectionId is required");
 
+  const productId = formData.get("productId");
   if (typeof productId !== "string" || productId.length != 13) {
     return json<ActionData>(
       { errors: { productId: "Valid ProductId is required" } },
       { status: 400 }
     );
   }
-  const collectionId = "cl2j76w5q0020rsswhw0pi28x";
+
   const addedProduct = await addProduct({
     productId,
     collectionId,
@@ -51,39 +54,30 @@ export const action: ActionFunction = async ({ request, params, context }) => {
   return addedProduct;
 };
 
-export const ProductSearch = () => {
-  const products = useFetcher<LoaderData>();
-  const { data } = products;
+export const ProductSearch = ({ productRenderChildren }: { productRenderChildren: ((product: Product) => ReactNode) }) => {
+  const search = useFetcher<LoaderData>();
+  const { data } = search;
 
   return (
     <>
       <div>
-        <products.Form method="get" action="/search">
+        <search.Form method="get" action="/search">
           <div>Submit a query</div>
           <input type={"text"} name="query" className="border-2" />
-        </products.Form>
+        </search.Form>
       </div>
 
       {data && data.searchResults ? (
         <>
           <h1 className="text-xl">Search results:</h1>
           <div className="flex flex-wrap lg:w-3/4">
-            {data.searchResults.map((item) => {
-              return (
-                <ProductCard item={item} key={item.productId}>
-                  <Form method="post">
-                    <input
-                      type="hidden"
-                      name="productId"
-                      value={item.productId}
-                    />
-                    <button className="rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700">
-                      Add to collection
-                    </button>
-                  </Form>
-                </ProductCard>
-              );
-            })}
+            {data.searchResults.map((item) => (
+              <ProductCard
+                item={item}
+                key={item.productId}
+                renderChildren={productRenderChildren}
+              ></ProductCard>
+            ))}
           </div>
         </>
       ) : (

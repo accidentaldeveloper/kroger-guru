@@ -1,11 +1,11 @@
-import type { CollectionProduct } from "@prisma/client";
+import type { Collection, CollectionProduct } from "@prisma/client";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import { ProductCard } from "~/components/product-card";
 
-import { deleteCollection } from "~/models/collection.server";
+import { addProduct, deleteCollection } from "~/models/collection.server";
 import { getCollection, removeProduct } from "~/models/collection.server";
 import { fetchProductsByProductIds } from "~/models/kroger.server";
 import type { Product } from "~/models/kroger/products.types";
@@ -36,16 +36,20 @@ export const action: ActionFunction = async ({ request, params }) => {
   invariant(collectionId, "collectionId not found");
   const formData = await request.formData();
   const { _action, productId } = Object.fromEntries(formData);
+  invariant(
+    typeof productId === "string" && productId.length === 13,
+    "productId not found"
+  );
   switch (_action) {
     case "delete":
       await deleteCollection({ userId, id: collectionId });
       return redirect("/collections");
     case "remove-product":
-      invariant(
-        productId && typeof productId == "string",
-        "productId required"
-      );
       return await removeProduct({ userId, collectionId, productId });
+    case "add-product":
+      return await addProduct({ userId, collectionId, productId });
+    default:
+      throw new Error("Unhandled action type");
   }
 };
 
@@ -60,6 +64,20 @@ async function fetchProductDetails(
   const productDetails = await fetchProductsByProductIds(productIds);
   return productDetails.data;
 }
+
+const addProductForm = (item: Product, collection: Collection) => (
+  <Form method="post">
+    <input type="hidden" name="productId" value={item.productId} />
+    <input type="hidden" name="collectionId" value={collection.id} />
+    <button
+      name="_action"
+      value="add-product"
+      className="rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700"
+    >
+      Add to collection
+    </button>
+  </Form>
+);
 
 export default function CollectionDetailsPage() {
   const { collection, productDetails } = useLoaderData() as LoaderData;
@@ -100,7 +118,9 @@ export default function CollectionDetailsPage() {
           Delete
         </button>
       </Form>
-      <ProductSearch />
+      <ProductSearch
+        productRenderChildren={(item) => addProductForm(item, collection)}
+      />
     </div>
   );
 }
