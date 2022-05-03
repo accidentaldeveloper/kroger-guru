@@ -65,19 +65,30 @@ async function fetchProductDetails(
   return productDetails.data;
 }
 
-const addProductForm = (item: Product, collection: Collection) => (
-  <Form method="post">
-    <input type="hidden" name="productId" value={item.productId} />
-    <input type="hidden" name="collectionId" value={collection.id} />
-    <button
-      name="_action"
-      value="add-product"
-      className="rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700"
-    >
-      Add to collection
-    </button>
-  </Form>
-);
+const addProductForm = (
+  item: Product,
+  collection: Collection,
+  collectionProducts: CollectionProduct[]
+) => {
+  const isInCollection = Boolean(
+    collectionProducts.find((cp) => cp.productId === item.productId)
+  );
+  return (
+    <Form method="post">
+      <input type="hidden" name="productId" value={item.productId} />
+      <input type="hidden" name="collectionId" value={collection.id} />
+      <button
+        name="_action"
+        // Need to change style when disabled
+        disabled={isInCollection}
+        value="add-product"
+        className="rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700"
+      >
+        {isInCollection ? "In Collection" : "Add to collection"}
+      </button>
+    </Form>
+  );
+};
 
 export default function CollectionDetailsPage() {
   const { collection, productDetails } = useLoaderData() as LoaderData;
@@ -119,7 +130,9 @@ export default function CollectionDetailsPage() {
         </button>
       </Form>
       <ProductSearch
-        productRenderChildren={(item) => addProductForm(item, collection)}
+        productRenderChildren={(item) =>
+          addProductForm(item, collection, collection.products)
+        }
       />
     </div>
   );
