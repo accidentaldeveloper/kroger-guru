@@ -35,8 +35,7 @@ export const action: ActionFunction = async ({ request, params }) => {
   const { collectionId } = params;
   invariant(collectionId, "collectionId not found");
   const formData = await request.formData();
-  const productId = formData.get("productId");
-  const { _action, ...values } = Object.fromEntries(formData);
+  const { _action, productId } = Object.fromEntries(formData);
   switch (_action) {
     case "delete":
       await deleteCollection({ userId, id: collectionId });
