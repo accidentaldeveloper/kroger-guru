@@ -1,13 +1,13 @@
-import { Form, useFetcher, useLoaderData } from "@remix-run/react";
+import { Form, useFetcher } from "@remix-run/react";
 import type { ActionFunction, LoaderFunction } from "@remix-run/server-runtime";
 import { redirect } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
-import { SizeEnum } from "~/models/kroger/products.types";
 import type { Product } from "~/models/kroger/products.types";
 import { searchProducts } from "~/models/product.server";
 import { requireUserId } from "~/session.server";
 import invariant from "tiny-invariant";
 import { addProduct } from "~/models/collection.server";
+import { ProductCard } from "~/components/product-card";
 
 type LoaderData = {
   searchResults: Product[] | null;
@@ -48,12 +48,12 @@ export const action: ActionFunction = async ({ request, params, context }) => {
     userId,
   });
 
-  return redirect(`/collections/${addedProduct.collectionId}`);
+  return addedProduct;
 };
 
 export const ProductSearch = () => {
   const products = useFetcher<LoaderData>();
-  // const {searchResults} = ;
+  const { data } = products;
 
   return (
     <>
@@ -64,20 +64,13 @@ export const ProductSearch = () => {
         </products.Form>
       </div>
 
-      {products.data && products.data.searchResults ? (
+      {data && data.searchResults ? (
         <>
           <h1 className="text-xl">Search results:</h1>
           <div className="flex flex-wrap lg:w-3/4">
-            {products.data.searchResults.map((item) => {
-              const image = item.images[0];
-              const mediumImage = image.sizes.find(
-                (i) => i.size === SizeEnum.Medium
-              );
+            {data.searchResults.map((item) => {
               return (
-                <div key={item.productId} className="w-96 border-2 py-4">
-                  <div>{item.description}</div>
-                  <div>{item.brand}</div>
-                  <img src={mediumImage?.url} alt=""></img>
+                <ProductCard item={item} key={item.productId}>
                   <Form method="post">
                     <input
                       type="hidden"
@@ -88,7 +81,7 @@ export const ProductSearch = () => {
                       Add to collection
                     </button>
                   </Form>
-                </div>
+                </ProductCard>
               );
             })}
           </div>
