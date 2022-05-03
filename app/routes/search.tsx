@@ -54,7 +54,11 @@ export const action: ActionFunction = async ({ request, params, context }) => {
   return addedProduct;
 };
 
-export const ProductSearch = ({ productRenderChildren }: { productRenderChildren: ((product: Product) => ReactNode) }) => {
+export const ProductSearch = ({
+  productRenderChildren,
+}: {
+  productRenderChildren: (product: Product) => ReactNode;
+}) => {
   const search = useFetcher<LoaderData>();
   const { data } = search;
 
@@ -72,11 +76,9 @@ export const ProductSearch = ({ productRenderChildren }: { productRenderChildren
           <h1 className="text-xl">Search results:</h1>
           <div className="flex flex-wrap lg:w-3/4">
             {data.searchResults.map((item) => (
-              <ProductCard
-                item={item}
-                key={item.productId}
-                renderChildren={productRenderChildren}
-              ></ProductCard>
+              <ProductCard item={item} key={item.productId}>
+                {productRenderChildren(item)}
+              </ProductCard>
             ))}
           </div>
         </>
