@@ -36,17 +36,21 @@ export const action: ActionFunction = async ({ request, params }) => {
   invariant(collectionId, "collectionId not found");
   const formData = await request.formData();
   const { _action, productId } = Object.fromEntries(formData);
-  invariant(
-    typeof productId === "string" && productId.length === 13,
-    "productId not found"
-  );
   switch (_action) {
     case "delete":
       await deleteCollection({ userId, id: collectionId });
       return redirect("/collections");
     case "remove-product":
+      invariant(
+        typeof productId === "string" && productId.length === 13,
+        "productId not found"
+      );
       return await removeProduct({ userId, collectionId, productId });
     case "add-product":
+      invariant(
+        typeof productId === "string" && productId.length === 13,
+        "productId not found"
+      );
       return await addProduct({ userId, collectionId, productId });
     default:
       throw new Error("Unhandled action type");
