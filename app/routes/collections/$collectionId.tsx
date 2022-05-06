@@ -105,7 +105,7 @@ export default function CollectionDetailsPage() {
     <div>
       <h3 className="text-2xl font-bold">{collection.title}</h3>
       <p className="py-6">{collection.body}</p>
-      <Form method="post" className="py-4">
+    <Form method="post" className="py-4">
         <button
           type="submit"
           name="_action"
