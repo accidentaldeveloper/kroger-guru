@@ -38,6 +38,8 @@ export const ProductSearch = ({
   const search = useFetcher<LoaderData>();
   const { data } = search;
 
+  const state = search.state;
+  const searching = state === "submitting";
   return (
     <>
       <div>
@@ -51,9 +53,9 @@ export const ProductSearch = ({
           />
           <button
             type="submit"
-            className="block rounded  bg-blue-500 py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400 my-4"
+            className="my-4 block  rounded bg-blue-500 py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
           >
-            Search
+            {searching ? "Searching..." : "Search"}
           </button>
         </search.Form>
       </div>
