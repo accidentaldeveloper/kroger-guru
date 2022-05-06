@@ -1,12 +1,8 @@
-import { Form, useFetcher } from "@remix-run/react";
+import { useFetcher } from "@remix-run/react";
 import type { ActionFunction, LoaderFunction } from "@remix-run/server-runtime";
-import { redirect } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
 import type { Product } from "~/models/kroger/products.types";
 import { searchProducts } from "~/models/product.server";
-import { requireUserId } from "~/session.server";
-import invariant from "tiny-invariant";
-import { addProduct } from "~/models/collection.server";
 import { ProductCard } from "~/components/product-card";
 import type { ReactNode } from "react";
 
