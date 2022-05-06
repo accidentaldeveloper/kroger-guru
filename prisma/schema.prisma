@@ -37,10 +37,12 @@ model Collection {
   userId String
 
   products CollectionProduct[]
+
+  isPublic Boolean @default(false)
 }
 
 model CollectionProduct {
-  id  String @id @default(cuid())
+  id        String @id @default(cuid())
   productId String
 
   createdAt DateTime @default(now())
