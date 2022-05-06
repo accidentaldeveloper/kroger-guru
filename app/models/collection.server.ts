@@ -11,8 +11,13 @@ export function getCollection({
   userId: User["id"];
 }) {
   return prisma.collection.findFirst({
-    where: { id, userId },
-    include: { products: true },
+    where: {
+      OR: [
+        { id, userId },
+        { id, isPublic: true },
+      ],
+    },
+    include: { products: { orderBy: { createdAt: "asc" } }, user: true },
   });
 }
 
@@ -50,6 +55,17 @@ export function deleteCollection({
 }: Pick<Collection, "id"> & { userId: User["id"] }) {
   return prisma.collection.deleteMany({
     where: { id, userId },
+  });
+}
+
+export function setCollectionVisibility({
+  id,
+  userId,
+  isPublic,
+}: Pick<Collection, "id" | "isPublic"> & { userId: User["id"] }) {
+  return prisma.collection.updateMany({
+    where: { id, userId },
+    data: { isPublic },
   });
 }
 

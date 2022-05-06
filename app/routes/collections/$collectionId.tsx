@@ -5,11 +5,16 @@ import { Form, useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import { ProductCard } from "~/components/product-card";
 
-import { addProduct, deleteCollection } from "~/models/collection.server";
+import {
+  addProduct,
+  deleteCollection,
+  setCollectionVisibility,
+} from "~/models/collection.server";
 import { getCollection, removeProduct } from "~/models/collection.server";
 import { fetchProductsByProductIds } from "~/models/kroger.server";
 import type { Product } from "~/models/kroger/products.types";
 import { requireUserId } from "~/session.server";
+import { useUser } from "~/utils";
 import { ProductSearch } from "../search";
 
 type LoaderData = {
@@ -30,16 +35,37 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   return json<LoaderData>({ collection, productDetails });
 };
 
+function dataToBoolean(maybeBool: FormDataEntryValue) {
+  if (typeof maybeBool !== "string") {
+    return null;
+  }
+  if (maybeBool === "true") {
+    return true;
+  }
+  if (maybeBool === "false") {
+    return false;
+  }
+  return null;
+}
+
 export const action: ActionFunction = async ({ request, params }) => {
   const userId = await requireUserId(request);
   const { collectionId } = params;
   invariant(collectionId, "collectionId not found");
   const formData = await request.formData();
-  const { _action, productId } = Object.fromEntries(formData);
+  const { _action, productId, setPublic } = Object.fromEntries(formData);
   switch (_action) {
     case "delete":
       await deleteCollection({ userId, id: collectionId });
       return redirect("/collections");
+    case "publish":
+      const isPublic = dataToBoolean(setPublic);
+      invariant(isPublic !== null, "isPublic not found");
+      return await setCollectionVisibility({
+        id: collectionId,
+        userId,
+        isPublic,
+      });
     case "remove-product":
       invariant(
         typeof productId === "string" && productId.length === 13,
@@ -96,49 +122,77 @@ const addProductForm = (
 
 export default function CollectionDetailsPage() {
   const { collection, productDetails } = useLoaderData() as LoaderData;
+  const user = useUser();
 
   if (collection === null) {
     throw Error("collection is null!");
   }
 
+  const canEdit = collection.userId === user.id;
+  const createdBy = canEdit ? "you" : collection.user.email;
   return (
     <div>
       <h3 className="text-2xl font-bold">{collection.title}</h3>
       <p className="py-6">{collection.body}</p>
-    <Form method="post" className="py-4">
-        <button
-          type="submit"
-          name="_action"
-          value="delete"
-          className="rounded bg-blue-500  py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
-        >
-          Delete Collection
-        </button>
-      </Form>
+      <div>Created by {createdBy}</div>
+      {canEdit ? (
+        <>
+          <Form method="post" className="py-4">
+            <input
+              type="hidden"
+              name="setPublic"
+              value={(!collection.isPublic).toString()}
+            />
+            <button
+              type="submit"
+              name="_action"
+              value="publish"
+              className="rounded bg-blue-500  py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
+            >
+              {collection.isPublic
+                ? "Unpublish Collection"
+                : "Publish Collection"}
+            </button>
+          </Form>
+          <Form method="post" className="py-4">
+            <button
+              type="submit"
+              name="_action"
+              value="delete"
+              className="rounded bg-blue-500  py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
+            >
+              Delete Collection
+            </button>
+          </Form>
+        </>
+      ) : null}
       <div className="flex flex-wrap">
         {productDetails.map((p) => (
           <ProductCard key={p.productId} item={p}>
-            <Form method="post">
-              <input type="hidden" value={p.productId} name="productId" />
-              <button
-                type="submit"
-                name="_action"
-                value="remove-product"
-                className="rounded bg-blue-500  py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
-              >
-                Remove
-              </button>
-            </Form>
+            {canEdit ? (
+              <Form method="post">
+                <input type="hidden" value={p.productId} name="productId" />
+                <button
+                  type="submit"
+                  name="_action"
+                  value="remove-product"
+                  className="rounded bg-blue-500  py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
+                >
+                  Remove
+                </button>
+              </Form>
+            ) : null}
           </ProductCard>
         ))}
       </div>
-
       <hr className="my-4" />
-      <ProductSearch
-        productRenderChildren={(item) =>
-          addProductForm(item, collection, collection.products)
-        }
-      />
+      {canEdit ? (
+        <ProductSearch
+          productRenderChildren={(item) =>
+            addProductForm(item, collection, collection.products)
+          }
+        />
+      ) : null}{" "}
     </div>
   );
 }
