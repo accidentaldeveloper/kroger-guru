@@ -105,7 +105,17 @@ export default function CollectionDetailsPage() {
     <div>
       <h3 className="text-2xl font-bold">{collection.title}</h3>
       <p className="py-6">{collection.body}</p>
-      <div>
+      <Form method="post" className="py-4">
+        <button
+          type="submit"
+          name="_action"
+          value="delete"
+          className="rounded bg-blue-500  py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
+        >
+          Delete Collection
+        </button>
+      </Form>
+      <div className="flex flex-wrap">
         {productDetails.map((p) => (
           <ProductCard key={p.productId} item={p}>
             <Form method="post">
@@ -122,17 +132,8 @@ export default function CollectionDetailsPage() {
           </ProductCard>
         ))}
       </div>
+
       <hr className="my-4" />
-      <Form method="post">
-        <button
-          type="submit"
-          name="_action"
-          value="delete"
-          className="rounded bg-blue-500  py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
-        >
-          Delete
-        </button>
-      </Form>
       <ProductSearch
         productRenderChildren={(item) =>
           addProductForm(item, collection, collection.products)

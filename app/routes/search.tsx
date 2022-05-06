@@ -30,30 +30,6 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   return json<LoaderData>({ searchResults });
 };
 
-export const action: ActionFunction = async ({ request, params, context }) => {
-  const userId = await requireUserId(request);
-
-  const formData = await request.formData();
-  const collectionId = formData.get("collectionId");
-  invariant(typeof collectionId === "string", "collectionId is required");
-
-  const productId = formData.get("productId");
-  if (typeof productId !== "string" || productId.length != 13) {
-    return json<ActionData>(
-      { errors: { productId: "Valid ProductId is required" } },
-      { status: 400 }
-    );
-  }
-
-  const addedProduct = await addProduct({
-    productId,
-    collectionId,
-    userId,
-  });
-
-  return addedProduct;
-};
-
 export const ProductSearch = ({
   productRenderChildren,
 }: {
@@ -66,15 +42,25 @@ export const ProductSearch = ({
     <>
       <div>
         <search.Form method="get" action="/search">
-          <div>Submit a query</div>
-          <input type={"text"} name="query" className="border-2" />
+          <h2 className="py-4 text-2xl">Search for Products</h2>
+          <input
+            type={"text"}
+            name="query"
+            className="border-2"
+            placeholder="Type a query"
+          />
+          <button
+            type="submit"
+            className="block rounded  bg-blue-500 py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400 my-4"
+          >
+            Search
+          </button>
         </search.Form>
       </div>
 
       {data && data.searchResults ? (
         <>
-          <h1 className="text-xl">Search results:</h1>
-          <div className="flex flex-wrap lg:w-3/4">
+          <div className="flex flex-wrap">
             {data.searchResults.map((item) => (
               <ProductCard item={item} key={item.productId}>
                 {productRenderChildren(item)}
@@ -83,7 +69,7 @@ export const ProductSearch = ({
           </div>
         </>
       ) : (
-        <div>make a query</div>
+        <div className="pt-4 pb-20 "></div>
       )}
     </>
   );

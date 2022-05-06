@@ -23,10 +23,10 @@ export default function CollectionsPage() {
   return (
     <div className="flex h-full min-h-screen flex-col">
       <header className="flex items-center justify-between bg-slate-800 p-4 text-white">
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-3xl font-bold grow">
           <Link to=".">Collections</Link>
         </h1>
-        <p>{user.email}</p>
+        <p className="px-4">{user.email}</p>
         <Form action="/logout" method="post">
           <button
             type="submit"
@@ -37,7 +37,7 @@ export default function CollectionsPage() {
         </Form>
       </header>
 
-      <main className="flex h-full bg-white">
+      <main className="flex h-max bg-white">
         <div className="h-full w-80 border-r bg-gray-50">
           <Link to="new" className="block p-4 text-xl text-blue-500">
             + New Collection
