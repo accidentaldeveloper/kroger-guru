@@ -49,6 +49,7 @@ export const ProductSearch = ({
           />
           <button
             type="submit"
+            disabled={searching}
             className="my-4 block  rounded bg-blue-500 py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
           >
             {searching ? "Searching..." : "Search"}
